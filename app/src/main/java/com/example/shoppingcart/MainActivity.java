@@ -115,11 +115,11 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
         data.add(new Product_item("Pencil color","It is a pencil color box", R.drawable.colors,"colors", 100));
         data.add(new Product_item("Television","It is a TV", R.drawable.tv, "tv",600));
         data.add(new Product_item("Laptop","It is a Laptop", R.drawable.laptop, "laptop",1000));
-//        data.add(new Product_item("Perfume","It is a perfume", R.drawable.perfume, "$300"));
-//        data.add(new Product_item("School Bag","It is a School Bag", R.drawable.bag, "$100"));
-//        data.add(new Product_item("NoteBook","It is Notebook", R.drawable.notebook, "$50"));
-//        data.add(new Product_item("Shoes","A pair of Jogger shoes", R.drawable.shoes, "$200"));
-//        data.add(new Product_item("Bicycle","It is bicycle", R.drawable.bicycle, "$500"));
+        data.add(new Product_item("Perfume","It is a perfume", R.drawable.perfume,"perfume", 300));
+        data.add(new Product_item("School Bag","It is a School Bag", R.drawable.bag,"bag", 100));
+        data.add(new Product_item("NoteBook","It is Notebook", R.drawable.notebook, "notebook",50));
+        data.add(new Product_item("Shoes","A pair of Jogger shoes", R.drawable.shoes,"shoes", 200));
+        data.add(new Product_item("Bicycle","It is bicycle", R.drawable.bicycle,"bicycle", 500));
 
         Intent intent = getIntent();
         src = intent.getStringExtra("src");
