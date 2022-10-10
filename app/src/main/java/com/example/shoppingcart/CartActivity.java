@@ -1,6 +1,7 @@
 package com.example.shoppingcart;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -28,7 +29,12 @@ public class CartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
+        CartViewModel vm = new ViewModelProvider(this).get(CartViewModel.class);
+        cartItems = vm.getNotes(savedInstanceState,"data");
+
         populateData();
+
+
 
         recyclerView = findViewById(R.id.cart_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));

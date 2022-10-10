@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
     private RecyclerView recyclerView;
     private ShoppingAdaptor adaptor;
     private ArrayList<CartModel> cartItems = new ArrayList<CartModel>();
-    private ArrayList<Product_item> data = new ArrayList<Product_item>();
+    private ArrayList<Product_item> data;
     private Filterable filterable;
     private EditText search;
     private Button viewCart;
@@ -38,6 +39,11 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+
+        ItemsViewModel vm = new ViewModelProvider(this).get(ItemsViewModel.class);
+        data = vm.getNotes(savedInstanceState,"data");
 
         createData();
 
