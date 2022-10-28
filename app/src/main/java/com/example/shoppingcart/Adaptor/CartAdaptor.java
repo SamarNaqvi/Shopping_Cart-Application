@@ -1,4 +1,4 @@
-package com.example.shoppingcart;
+package com.example.shoppingcart.Adaptor;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +9,10 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.shoppingcart.Model.CartModel;
+import com.example.shoppingcart.Model.Product_item;
+import com.example.shoppingcart.R;
 
 import java.util.ArrayList;
 
@@ -35,10 +39,13 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
         Product_item item = this.cartItems.get(position).getProduct();
 
         holder.name.setText(item.getName());
-        int imgResource = item.getImg();
+        String imgRsc = item.getImgName();
+        int imgResource = holder.productIcon.getContext().getResources().getIdentifier(imgRsc, "drawable", holder.productIcon.getContext().getPackageName());
+        holder.productIcon.setImageResource(imgResource);
+
         float price = item.getPrice();
         holder.price.setText("$" + Float.toString(price));
-        holder.productIcon.setImageDrawable(holder.itemView.getContext().getDrawable(imgResource));
+  //      holder.productIcon.setImageDrawable(holder.itemView.getContext().getDrawable(imgResource));
         holder.quantity.setText(Integer.toString(this.cartItems.get(position).getQuantity()));
         holder.incQuantity.setTag(position);
         holder.decQuantity.setTag(position);
@@ -72,6 +79,7 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
                 public void onClick(View view) {
                     int pos = (int) view.getTag();
                     CartModel obj = cartItems.get(pos);
+                    CartModel.removeItem("CART", obj.getProduct().getID(), view.getContext());
                     cartItems.remove(obj);
                     notifyDataSetChanged();
                 }
@@ -86,12 +94,16 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
 
                     if(quantity==1)
                     {
+                        CartModel.removeItem("CART", obj.getProduct().getID(), view.getContext());
                         cartItems.remove(obj);
                     }
                     else
                     {
                         obj.setQuantity(quantity-1);
+                        CartModel.updateItem("CART",  obj, view.getContext());
+
                     }
+
                     notifyDataSetChanged();
                 }
             });
@@ -104,6 +116,7 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
                     int quantity = obj.getQuantity();
 
                     obj.setQuantity(quantity+1);
+                    CartModel.updateItem("CART",  obj, view.getContext());
 
                     notifyDataSetChanged();
                 }

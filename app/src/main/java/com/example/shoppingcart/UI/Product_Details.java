@@ -1,4 +1,4 @@
-package com.example.shoppingcart;
+package com.example.shoppingcart.UI;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -6,7 +6,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -14,7 +13,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.io.Serializable;
+import com.example.shoppingcart.Model.CartModel;
+import com.example.shoppingcart.Model.Product_item;
+import com.example.shoppingcart.R;
+
 import java.util.ArrayList;
 
 
@@ -28,6 +30,7 @@ public class Product_Details extends AppCompatActivity  {
     private int rscId;
     private boolean isAdded;
     private String imgRsc, price2;
+    private int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +44,7 @@ public class Product_Details extends AppCompatActivity  {
         img = findViewById(R.id.card_icon);
         addCart = findViewById(R.id.add_cart);
 
-
+        id = Integer.parseInt(intent.getStringExtra("id"));
         name.setText(intent.getStringExtra("name"));
         price2 = intent.getStringExtra("price");
         price.setText("$"+price2);
@@ -57,9 +60,8 @@ public class Product_Details extends AppCompatActivity  {
             @Override
             public void onClick(View view) {
                 isAdded=true;
-                Product_item item = new Product_item(
-                        name.getText().toString(),description.getText().toString(),
-                        rscId, imgRsc, Float.parseFloat(price2)
+                Product_item item = new Product_item(id,
+                        name.getText().toString(),description.getText().toString(), imgRsc, Float.parseFloat(price2)
                 );
 
                 int index = -1;

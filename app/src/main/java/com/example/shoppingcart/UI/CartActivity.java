@@ -1,18 +1,21 @@
-package com.example.shoppingcart;
+package com.example.shoppingcart.UI;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import java.io.Serializable;
+import com.example.shoppingcart.Adaptor.CartAdaptor;
+import com.example.shoppingcart.Model.CartModel;
+import com.example.shoppingcart.ViewModel.CartViewModel;
+import com.example.shoppingcart.R;
+
 import java.util.ArrayList;
 
 public class CartActivity extends AppCompatActivity {
@@ -27,6 +30,7 @@ public class CartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_cart);
 
         CartViewModel vm = new ViewModelProvider(this).get(CartViewModel.class);
@@ -60,22 +64,23 @@ public class CartActivity extends AppCompatActivity {
         BackToItems.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(cartItems.size()>0)
+                    CartModel.saveCart(cartItems,  CartActivity.this);
                 Intent intent;
                 if(!src.equals("main"))
                 {
                     intent = new Intent(view.getContext(),MainActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelableArrayList("products", cartItems);
-                    intent.putExtras(bundle);
+//                    Bundle bundle = new Bundle();
+//                    bundle.putParcelableArrayList("products", cartItems);
+//                    intent.putExtras(bundle);
                     intent.putExtra("src","cart");
                     startActivity(intent);
                 }
                 else {
                     intent = new Intent();
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelableArrayList("products", cartItems);
-                    intent.putExtras(bundle);
+//                    Bundle bundle = new Bundle();
+//                    bundle.putParcelableArrayList("products", cartItems);
+//                    intent.putExtras(bundle);
                     setResult(1, intent);
                     CartActivity.super.onBackPressed();
                 }
@@ -84,10 +89,15 @@ public class CartActivity extends AppCompatActivity {
         });
     }
 
+
     public void populateData() {
         Intent intent = getIntent();
         src = intent.getStringExtra("src");
         cartItems.clear();
         cartItems = intent.getExtras().getParcelableArrayList("products");
+        if(cartItems.size()>0)
+        {
+            CartModel.saveCart(cartItems,CartActivity.this);
+        }
     }
 }

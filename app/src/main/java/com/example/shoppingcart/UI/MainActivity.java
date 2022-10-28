@@ -1,4 +1,4 @@
-package com.example.shoppingcart;
+package com.example.shoppingcart.UI;
 
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,8 +17,14 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Filterable;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.shoppingcart.Model.CartModel;
+import com.example.shoppingcart.ViewModel.ItemsViewModel;
+import com.example.shoppingcart.Model.Product_item;
+import com.example.shoppingcart.R;
+import com.example.shoppingcart.Adaptor.ShoppingAdaptor;
+import com.example.shoppingcart.DB.dataLayer;
 
 import java.util.ArrayList;
 
@@ -34,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
     private Button viewCart;
     private ActivityResultLauncher<Intent> shopLauncher;
     private String src;
+    private dataLayer dbAccess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
             public void onClick(View view) {
                 Intent intent =  new Intent(view.getContext(), CartActivity.class);
 
-
                 if(cartItems.size()>0)
                 {
                     Bundle bundle = new Bundle();
@@ -102,9 +107,8 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
                     @Override
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == 1) {
-                            Intent intent = result.getData();
-                            cartItems.clear();
-                            cartItems = intent.getExtras().getParcelableArrayList("products");
+
+                            cartItems = CartModel.loadItems(MainActivity.this);
                         }
 
                     }
@@ -117,29 +121,23 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
 
     public void createData()
     {
-        data.add(new Product_item("Chair","It is a chair", R.drawable.chair,"chair", 200));
-        data.add(new Product_item("Pencil color","It is a pencil color box", R.drawable.colors,"colors", 100));
-        data.add(new Product_item("Television","It is a TV", R.drawable.tv, "tv",600));
-        data.add(new Product_item("Laptop","It is a Laptop", R.drawable.laptop, "laptop",1000));
-        data.add(new Product_item("Perfume","It is a perfume", R.drawable.perfume,"perfume", 300));
-        data.add(new Product_item("School Bag","It is a School Bag", R.drawable.bag,"bag", 100));
-        data.add(new Product_item("NoteBook","It is Notebook", R.drawable.notebook, "notebook",50));
-        data.add(new Product_item("Shoes","A pair of Jogger shoes", R.drawable.shoes,"shoes", 200));
-        data.add(new Product_item("Bicycle","It is bicycle", R.drawable.bicycle,"bicycle", 500));
-
-        Intent intent = getIntent();
-        src = intent.getStringExtra("src");
-        if(src!=null)
-        {
-            cartItems.clear();
-            cartItems = intent.getExtras().getParcelableArrayList("products");
+        if(data.size()==0) {
+            data = Product_item.loadItems(MainActivity.this);
         }
+
+        if(cartItems.size()==0)
+        {
+            cartItems = CartModel.loadItems(MainActivity.this);
+        }
+
+
     }
 
     @Override
     public void onItemClick(int pos) {
         Intent intent =  new Intent(this, Product_Details.class);
         Product_item item  = this.data.get(pos);
+        intent.putExtra("id",Integer.toString(item.getID()));
         intent.putExtra("name",item.getName());
         intent.putExtra("description",item.getDescription());
         intent.putExtra("price",Float.toString(item.getPrice()));

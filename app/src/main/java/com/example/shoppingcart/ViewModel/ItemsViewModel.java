@@ -1,8 +1,10 @@
-package com.example.shoppingcart;
+package com.example.shoppingcart.ViewModel;
 
 import android.os.Bundle;
 
 import androidx.lifecycle.ViewModel;
+
+import com.example.shoppingcart.Model.Product_item;
 
 import java.util.ArrayList;
 

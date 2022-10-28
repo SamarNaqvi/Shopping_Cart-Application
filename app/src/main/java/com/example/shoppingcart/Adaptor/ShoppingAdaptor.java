@@ -1,4 +1,4 @@
-package com.example.shoppingcart;
+package com.example.shoppingcart.Adaptor;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,10 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.time.temporal.Temporal;
+import com.example.shoppingcart.Model.Product_item;
+import com.example.shoppingcart.R;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Locale;
 
 public class ShoppingAdaptor extends RecyclerView.Adapter<ShoppingAdaptor.ShoppingViewHolder> implements Filterable {
 
@@ -44,10 +45,13 @@ public class ShoppingAdaptor extends RecyclerView.Adapter<ShoppingAdaptor.Shoppi
         String name = filteredItems.get(position).getName();
         holder.name.setText(name);
         holder.description.setText(filteredItems.get(position).getDescription());
-        int imgResource = filteredItems.get(position).getImg();
         float price = filteredItems.get(position).getPrice();
         holder.price.setText("$" + Float.toString(price));
-        holder.img.setImageDrawable(holder.itemView.getContext().getDrawable(imgResource));
+        String imgRsc = filteredItems.get(position).getImgName();
+        int imgResource = holder.img.getContext().getResources().getIdentifier(imgRsc, "drawable", holder.img.getContext().getPackageName());
+        holder.img.setImageResource(imgResource);
+
+//        holder.img.setImageDrawable(holder.itemView.getContext().getDrawable(imgResource));
     }
 
 
