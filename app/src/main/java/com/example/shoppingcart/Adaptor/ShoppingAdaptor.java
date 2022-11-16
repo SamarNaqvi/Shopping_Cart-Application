@@ -31,6 +31,12 @@ public class ShoppingAdaptor extends RecyclerView.Adapter<ShoppingAdaptor.Shoppi
         filteredItems=new ArrayList<Product_item>(ds);
         this.listener= listener;
     }
+    public void setDataSet(ArrayList<Product_item> ds,ItemClickListener listener)
+    {
+        this.dataSet = filteredItems = null;
+        this.dataSet = filteredItems = ds;
+        this.listener = listener;
+    }
 
 
     @Override

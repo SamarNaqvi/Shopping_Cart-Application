@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,7 +20,9 @@ import android.widget.EditText;
 import android.widget.Filterable;
 import android.widget.Toast;
 
+import com.example.shoppingcart.DB.firebaseDb;
 import com.example.shoppingcart.Model.CartModel;
+import com.example.shoppingcart.ViewModel.CartViewModel;
 import com.example.shoppingcart.ViewModel.ItemsViewModel;
 import com.example.shoppingcart.Model.Product_item;
 import com.example.shoppingcart.R;
@@ -37,9 +40,11 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
     private Filterable filterable;
     private EditText search;
     private Button viewCart;
+    private Button CustomerSupport;
     private ActivityResultLauncher<Intent> shopLauncher;
     private String src;
     private dataLayer dbAccess;
+    ItemsViewModel vm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,16 +53,16 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
 
 
 
-        ItemsViewModel vm = new ViewModelProvider(this).get(ItemsViewModel.class);
+        vm = new ViewModelProvider(this).get(ItemsViewModel.class);
         data = vm.getNotes(savedInstanceState,"data");
-
-        createData();
 
         RecyclerView recyclerView = findViewById(R.id.itemsList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adaptor = new ShoppingAdaptor(data, this);
 
         recyclerView.setAdapter(adaptor);
+
+        createData();
 
         search = findViewById(R.id.search);
         search.addTextChangedListener(new TextWatcher() {
@@ -83,7 +88,12 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
             public void onClick(View view) {
                 Intent intent =  new Intent(view.getContext(), CartActivity.class);
 
-                if(cartItems.size()>0)
+                if(cartItems==null)
+                {
+                    cartItems = CartModel.getCartItems();
+                }
+
+                if(cartItems!=null && cartItems.size()>0)
                 {
                     Bundle bundle = new Bundle();
                     bundle.putParcelableArrayList("products",cartItems);
@@ -101,6 +111,16 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
             }
         });
 
+        CustomerSupport =findViewById(R.id.customerSupport);
+        CustomerSupport.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Intent.ACTION_DIAL);
+                intent.setData(Uri.parse("tel:0123456789"));
+                startActivity(intent);
+            }
+        });
+
         //register launcher
         shopLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -108,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
                     public void onActivityResult(ActivityResult result) {
                         if (result.getResultCode() == 1) {
 
-                            cartItems = CartModel.loadItems(MainActivity.this);
+                            cartItems = CartModel.getCartItems();
                         }
 
                     }
@@ -121,21 +141,38 @@ public class MainActivity extends AppCompatActivity implements ShoppingAdaptor.I
 
     public void createData()
     {
-        if(data.size()==0) {
-            data = Product_item.loadItems(MainActivity.this);
+        data = Product_item.getProdItems();
+        if(data==null || data.size()==0) {
+                Product_item.loadItemsFromFirebase(adaptor, MainActivity.this);
         }
 
-        if(cartItems.size()==0)
+        cartItems = CartModel.getCartItems();
+        if(cartItems==null || cartItems.size()==0)
         {
-            cartItems = CartModel.loadItems(MainActivity.this);
+            CartModel.loadItemsFromFirebase(Product_item.db);
         }
 
+        if(data!=null && data.size()>0 && adaptor.getItemCount()==0)
+        {
+            adaptor.setDataSet(data,this);
+            adaptor.notifyDataSetChanged();
+        }
 
     }
 
     @Override
     public void onItemClick(int pos) {
         Intent intent =  new Intent(this, Product_Details.class);
+        if(this.data==null || this.data.size()==0)
+        {
+            this.data = Product_item.getProdItems();
+        }
+
+        if(cartItems==null || cartItems.size()==0)
+        {
+            cartItems = CartModel.getCartItems();
+        }
+
         Product_item item  = this.data.get(pos);
         intent.putExtra("id",Integer.toString(item.getID()));
         intent.putExtra("name",item.getName());

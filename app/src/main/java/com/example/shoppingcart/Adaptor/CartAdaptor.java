@@ -24,6 +24,12 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
         this.cartItems = cartItems;
     }
 
+    public void setDataSet(ArrayList<CartModel> ds)
+    {
+        this.cartItems =  null;
+        this.cartItems =  ds;
+    }
+
     @NonNull
     @Override
     public CartViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -79,7 +85,7 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
                 public void onClick(View view) {
                     int pos = (int) view.getTag();
                     CartModel obj = cartItems.get(pos);
-                    CartModel.removeItem("CART", obj.getProduct().getID(), view.getContext());
+                    CartModel.removeItem("CART", obj.getProduct().getID(), view.getContext(), false);
                     cartItems.remove(obj);
                     notifyDataSetChanged();
                 }
@@ -94,13 +100,13 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
 
                     if(quantity==1)
                     {
-                        CartModel.removeItem("CART", obj.getProduct().getID(), view.getContext());
+                        CartModel.removeItem("CART", obj.getProduct().getID(), view.getContext(),false);
                         cartItems.remove(obj);
                     }
                     else
                     {
                         obj.setQuantity(quantity-1);
-                        CartModel.updateItem("CART",  obj, view.getContext());
+                        CartModel.updateItem("CART",  obj, view.getContext(), false);
 
                     }
 
@@ -116,7 +122,7 @@ public class CartAdaptor extends RecyclerView.Adapter<CartAdaptor.CartViewHolder
                     int quantity = obj.getQuantity();
 
                     obj.setQuantity(quantity+1);
-                    CartModel.updateItem("CART",  obj, view.getContext());
+                    CartModel.updateItem("CART",  obj, view.getContext(), false);
 
                     notifyDataSetChanged();
                 }

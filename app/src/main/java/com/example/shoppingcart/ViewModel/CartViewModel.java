@@ -5,11 +5,21 @@ import android.os.Bundle;
 import androidx.lifecycle.ViewModel;
 
 import com.example.shoppingcart.Model.CartModel;
+import com.example.shoppingcart.Model.Product_item;
 
 import java.util.ArrayList;
 
 public class CartViewModel extends ViewModel {
-    private ArrayList<CartModel> data;
+    private static ArrayList<CartModel> data;
+
+    public static ArrayList<CartModel> getData() {
+        return data;
+    }
+
+    public static void setData(ArrayList<CartModel> data)
+    {
+        data = data;
+    }
 
 
     public ArrayList<CartModel> getNotes(Bundle savedInstanceState, String key){
@@ -23,5 +33,7 @@ public class CartViewModel extends ViewModel {
         }
         return data;
     }
+
+
 
 }

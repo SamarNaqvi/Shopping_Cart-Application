@@ -4,7 +4,9 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.shoppingcart.Adaptor.ShoppingAdaptor;
 import com.example.shoppingcart.DB.dataLayer;
+import com.example.shoppingcart.DB.firebaseDb;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -17,6 +19,7 @@ public class Product_item implements Parcelable {
     private String description;
     private String imgName;
     private float Price;
+    public static firebaseDb db;
 
     public Product_item(int id, String name, String description, String imgName, float price) {
         this.id =  id;
@@ -26,6 +29,8 @@ public class Product_item implements Parcelable {
         this.imgName = imgName;
         Price = price;
     }
+
+    public Product_item(){};
 
 
     protected Product_item(Parcel in) {
@@ -51,16 +56,31 @@ public class Product_item implements Parcelable {
                 Integer.parseInt(product.get("id")),
                 product.get("name"),
                 product.get("description"),
-                product.get("icon"),
+                product.get("imgName"),
                 Float.parseFloat(product.get("price")
                 ));
     }
+
+    public static  void loadItemsFromFirebase(ShoppingAdaptor adp, Context ctx)
+    {
+        if(db==null) {
+            db = new firebaseDb(adp, ctx);
+            db.loadProducts("Products");
+        }
+    }
+
+
+
     public static ArrayList<Product_item> loadItems(Context context)
     {
         ArrayList<Hashtable<String,String>>productList = new ArrayList<Hashtable<String,String>>();
         dataLayer dbAccess = new dataLayer(context);
         productList.addAll(dbAccess.loadALL("Product"));
+        return Product_genertation(productList);
+    }
 
+    public static ArrayList<Product_item>Product_genertation(ArrayList<Hashtable<String,String>>productList)
+    {
         ArrayList<Product_item>data = new ArrayList<Product_item>();
 
         for(Hashtable<String,String> product : productList){
@@ -85,6 +105,13 @@ public class Product_item implements Parcelable {
             return new Product_item[size];
         }
     };
+
+    public static ArrayList<Product_item> getProdItems()
+    {
+        if(db!=null)
+        return db.getDataList();
+        else return  null;
+    }
 
     public int getID(){ return this.id; }
 

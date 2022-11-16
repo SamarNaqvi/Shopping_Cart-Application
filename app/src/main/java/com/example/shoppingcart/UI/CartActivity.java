@@ -65,22 +65,16 @@ public class CartActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if(cartItems.size()>0)
-                    CartModel.saveCart(cartItems,  CartActivity.this);
+                    CartModel.saveCart(cartItems,  CartActivity.this, false);
                 Intent intent;
                 if(!src.equals("main"))
                 {
                     intent = new Intent(view.getContext(),MainActivity.class);
-//                    Bundle bundle = new Bundle();
-//                    bundle.putParcelableArrayList("products", cartItems);
-//                    intent.putExtras(bundle);
                     intent.putExtra("src","cart");
                     startActivity(intent);
                 }
                 else {
                     intent = new Intent();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putParcelableArrayList("products", cartItems);
-//                    intent.putExtras(bundle);
                     setResult(1, intent);
                     CartActivity.super.onBackPressed();
                 }
@@ -97,7 +91,7 @@ public class CartActivity extends AppCompatActivity {
         cartItems = intent.getExtras().getParcelableArrayList("products");
         if(cartItems.size()>0)
         {
-            CartModel.saveCart(cartItems,CartActivity.this);
+            CartModel.saveCart(cartItems,CartActivity.this,false);
         }
     }
 }

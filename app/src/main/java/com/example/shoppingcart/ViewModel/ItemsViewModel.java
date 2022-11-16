@@ -10,7 +10,18 @@ import java.util.ArrayList;
 
 public class ItemsViewModel extends ViewModel {
 
-    private ArrayList<Product_item> data;
+    private static ArrayList<Product_item> data;
+
+    public static void setData(ArrayList<Product_item> data)
+    {
+        data = data;
+    }
+
+    public ArrayList<Product_item> getData()
+    {
+        return data;
+    }
+
 
 
     public ArrayList<Product_item> getNotes(Bundle savedInstanceState, String key){

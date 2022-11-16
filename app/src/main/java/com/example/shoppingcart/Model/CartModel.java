@@ -5,6 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.example.shoppingcart.DB.dataLayer;
+import com.example.shoppingcart.DB.firebaseDb;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -13,27 +14,36 @@ public class CartModel implements Parcelable {
 
     private Product_item product;
     private int quantity;
-
+    public static firebaseDb db;
     public CartModel(Product_item product, int quantity) {
         this.product = product;
         this.quantity = quantity;
     }
 
-    public static void saveCart(ArrayList<CartModel>cartItems, Context context)
+    public static void saveCart(ArrayList<CartModel>cartItems, Context context, boolean dbType)
     {
         ArrayList<Hashtable<String,String>>cartList= new ArrayList<Hashtable<String,String>>();
 
         for( CartModel item : cartItems)
         {
             Hashtable<String,String>obj=new Hashtable<String,String>();
-            obj.put("prodid",Integer.toString(item.getProduct().getID()));
-            obj.put("quantity", Integer.toString(item.getQuantity()));
+            obj.put("ProdId",Integer.toString(item.getProduct().getID()));
+            obj.put("Quantity", Integer.toString(item.getQuantity()));
             cartList.add(obj);
         }
 
-        dataLayer dbHelper = new dataLayer(context);
-        dbHelper.save(cartList, "CART");
+        if(dbType) //Sql lite if true
+        {
+            dataLayer dbHelper = new dataLayer(context);
+            dbHelper.save(cartList, "CART");
+        }
+        else
+        {
+            db.saveCartItems(cartList, cartItems);
+        }
     }
+
+
 
     public static ArrayList<CartModel> loadItems(Context context)
     {
@@ -43,15 +53,33 @@ public class CartModel implements Parcelable {
         {
             return new ArrayList<CartModel>();
         }
+
+        return Cart_generator(Items,null, dbHelper);
+    }
+
+
+
+    public static  ArrayList<CartModel> Cart_generator(ArrayList<Hashtable<String,String>> Items, ArrayList<Product_item>products, dataLayer db)
+    {
         ArrayList<CartModel>cartItems = new ArrayList<CartModel>();
 
         for ( Hashtable<String,String> item: Items)
         {
-            Hashtable<String,String> product= dbHelper.loadById(item.get("prodid"),"Product");
+            Product_item product = null;
+            if(products==null)
+            {
+                product = Product_item.generateProduct(
+                        db.loadById(item.get("prodid"), "Product"));
+            }
+            else {
+                product = getProduct(products, Integer.parseInt(item.get("ProdId")));
+            }
+
             cartItems.add(
+
                     new CartModel(
-                            Product_item.generateProduct(product),
-                            Integer.parseInt(item.get("quantity"))
+                            product,
+                            Integer.parseInt(item.get("Quantity"))
                     )
             );
         }
@@ -59,6 +87,31 @@ public class CartModel implements Parcelable {
         return cartItems.size()>0? cartItems : new ArrayList<CartModel>();
     }
 
+    public static Product_item getProduct(ArrayList<Product_item> products, int id)
+    {
+        for(Product_item item: products)
+        {
+            if(item.getID()==id)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public static ArrayList<CartModel> getCartItems()
+    {
+        if(db!=null)
+            return db.getCartList();
+        else
+            return null;
+    }
+
+    public static void loadItemsFromFirebase(firebaseDb database)
+    {
+        db = database;
+        db.loadProducts("CartItems");
+    }
     protected CartModel(Parcel in) {
         product = in.readParcelable(Product_item.class.getClassLoader());
         quantity = in.readInt();
@@ -76,14 +129,26 @@ public class CartModel implements Parcelable {
         }
     };
 
-    public static void removeItem(String cart, int id, Context context) {
-        dataLayer dbHelper = new dataLayer(context);
-       dbHelper.removeItem(cart, id);
+    public static void removeItem(String cart, int id, Context context, boolean dbType) {
+        if(dbType) { //if dbType=>true then use sql lite otherwise use firebase
+            dataLayer dbHelper = new dataLayer(context);
+            dbHelper.removeItem(cart, id);
+        }
+        else
+        {
+            db.removeItem("CartItems", id);
+        }
     }
 
-    public static void updateItem(String cart, CartModel obj, Context context) {
-        dataLayer dbHelper = new dataLayer(context);
-        dbHelper.updateItem(cart, obj);
+    public static void updateItem(String cart, CartModel obj, Context context, boolean dbType) {
+        if(dbType) { //if dbType=>true then use sql lite otherwise use firebase
+            dataLayer dbHelper = new dataLayer(context);
+            dbHelper.updateItem(cart, obj);
+        }
+        else
+        {
+            db.updateItem("CartItems",obj);
+        }
     }
 
     public Product_item getProduct() {
